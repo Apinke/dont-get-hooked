@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://apinke.github.io/dont-get-hooked/"><strong>▶ Read the Live Comic</strong></a> &nbsp;·&nbsp;
   <a href="https://github.com/Apinke/dont-get-hooked/fork">Fork this repo</a> &nbsp;·&nbsp;
-  <a href="#licence">Licence</a>
+  <a href="#license">License</a>
 </p>
 
 ---
@@ -94,23 +94,23 @@ Contributions are welcome! You can:
 - 🐛 **Report issues** via GitHub Issues
 - ⭐ **Star the repo** to show support
 
-Please read the licence terms below before adapting or redistributing.
+Please read the license terms below before adapting or redistributing.
 
 ---
 
-## 📝 Licence <a name="licence"></a>
+## 📝 License <a name="license"></a>
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
-<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
+<img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
 
-This work is licensed under a [Creative Commons Attribution 4.0 International Licence (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/).
+This work is licensed under a [Creative Commons Attribution 4.0 International License (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/).
 
 **You are free to:**
 - ✅ Share — copy and redistribute in any medium or format
 - ✅ Adapt — remix, transform, and build upon the material for any purpose, including commercially
 
 **Under the following terms:**
-- 📛 **Attribution** — You must give appropriate credit to **Gbemisola Esho**, provide a link to the licence, and indicate if changes were made.
+- 📛 **Attribution** — You must give appropriate credit to **Gbemisola Esho**, provide a link to the license, and indicate if changes were made.
 
 ---
 
