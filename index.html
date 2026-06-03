@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Don't Get Hooked! — Phishing for Beginners</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#FF3B3B;--orange:#FF8C00;--yellow:#FFD700;
+  --blue:#1E90FF;--green:#00C851;--purple:#9B59B6;
+  --dark:#1A0A2E;--panel:#FFF9F0;--ink:#1A0A2E;
+  --halftone: radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
+}
+body{
+  background:var(--dark);
+  font-family:'Comic Neue',cursive;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  background-image: radial-gradient(ellipse at top, #2d1b69, #1A0A2E);
+}
+
+/* HEADER */
+.hdr{
+  width:100%;padding:16px 20px;text-align:center;
+  background:var(--red);
+  border-bottom:4px solid var(--ink);
+  position:relative;overflow:hidden;
+}
+.hdr::before{
+  content:'';position:absolute;inset:0;
+  background:var(--halftone);background-size:8px 8px;opacity:0.4;
+}
+.hdr h1{
+  font-family:'Bangers',cursive;font-size:2.2rem;
+  color:#fff;letter-spacing:3px;
+  text-shadow:3px 3px 0 var(--ink);position:relative;
+}
+.hdr p{font-size:0.82rem;color:#FFD700;margin-top:4px;font-weight:700;position:relative;}
+.level-badge{
+  display:inline-block;background:var(--yellow);color:var(--ink);
+  font-family:'Bangers',cursive;font-size:1rem;letter-spacing:2px;
+  padding:3px 14px;border-radius:20px;border:2px solid var(--ink);
+  margin-top:6px;position:relative;
+}
+
+/* PROGRESS */
+.prog-wrap{width:100%;max-width:560px;padding:10px 16px;display:flex;align-items:center;gap:10px;}
+.prog-bar{flex:1;height:10px;background:#2d1b69;border-radius:5px;border:2px solid rgba(255,255,255,0.2);overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:5px;transition:width 0.4s;}
+.prog-txt{font-family:'Bangers',cursive;font-size:1rem;color:var(--yellow);white-space:nowrap;}
+
+/* BOOK */
+.comic-wrap{width:100%;max-width:560px;padding:12px 16px;flex:1;}
+.book{width:100%;perspective:1400px;}
+.page{display:none;width:100%;}
+.page.active{display:block;}
+.page-inner{
+  position:relative;width:100%;
+  transform-style:preserve-3d;
+  transition:transform 0.7s cubic-bezier(0.77,0,0.175,1);
+}
+.page-inner.flipped{transform:rotateY(-180deg);}
+.page-front,.page-back{
+  width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:4px;border:4px solid var(--ink);
+  box-shadow:6px 6px 0 var(--ink);overflow:hidden;
+}
+.page-back{
+  position:absolute;top:0;left:0;
+  transform:rotateY(180deg);
+  background:linear-gradient(135deg,#1E2A4A,#0D1B2E);
+  display:flex;align-items:center;justify-content:center;min-height:380px;
+}
+
+/* COMIC PANEL DESIGN */
+.comic-page{
+  background:var(--panel);
+  background-image:var(--halftone);
+  background-size:6px 6px;
+  padding:0;
+}
+.panel-header{
+  background:var(--ink);color:#fff;
+  font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:2px;
+  padding:10px 16px;display:flex;align-items:center;gap:10px;
+}
+.panel-header .ch-icon{font-size:1.6rem;}
+.panels{display:flex;flex-direction:column;gap:0;}
+.panel{
+  border-bottom:3px solid var(--ink);
+  padding:14px 16px;position:relative;
+  background:var(--panel);
+  min-height:80px;display:flex;flex-direction:column;gap:8px;
+}
+.panel:last-child{border-bottom:none;}
+.panel-bg-red{background:#FFF0F0;}
+.panel-bg-blue{background:#F0F4FF;}
+.panel-bg-yellow{background:#FFFBF0;}
+.panel-bg-green{background:#F0FFF4;}
+
+/* Speech bubbles */
+.bubble{
+  background:#fff;border:2.5px solid var(--ink);border-radius:18px;
+  padding:8px 14px;font-size:0.88rem;font-weight:700;
+  position:relative;display:inline-block;max-width:90%;line-height:1.4;
+}
+.bubble.evil{background:#FFE4E4;border-color:var(--red);}
+.bubble.safe{background:#E4FFE4;border-color:var(--green);}
+.bubble.warn{background:#FFF9E4;border-color:var(--orange);}
+.bubble.ai{background:#E8E4FF;border-color:var(--purple);}
+.bubble::after{
+  content:'';position:absolute;bottom:-12px;left:20px;
+  border:6px solid transparent;border-top-color:var(--ink);
+}
+.bubble.right::after{left:auto;right:20px;}
+
+/* Characters */
+.char-row{display:flex;align-items:flex-end;gap:10px;}
+.char{font-size:2.8rem;line-height:1;}
+.char-label{font-size:0.7rem;font-weight:700;color:var(--ink);text-align:center;margin-top:2px;}
+.narrator{
+  background:var(--yellow);border:2.5px solid var(--ink);
+  border-radius:4px;padding:6px 12px;font-size:0.82rem;
+  font-weight:700;font-style:italic;text-align:center;
+  margin-top:4px;
+}
+
+/* BACK of page */
+.back-content{padding:28px 22px;text-align:center;width:100%;}
+.back-ch{font-family:'Bangers',cursive;font-size:1rem;color:var(--yellow);letter-spacing:3px;margin-bottom:8px;}
+.back-title{font-family:'Bangers',cursive;font-size:1.8rem;color:#fff;margin-bottom:20px;letter-spacing:1px;line-height:1.2;}
+.back-points{display:flex;flex-direction:column;gap:10px;text-align:left;}
+.back-point{
+  background:rgba(255,255,255,0.06);border-left:4px solid var(--yellow);
+  padding:10px 14px;border-radius:0 8px 8px 0;
+  font-size:0.88rem;color:#E2E8F0;line-height:1.5;
+}
+.back-point strong{color:var(--yellow);}
+
+/* CONTROLS */
+.controls{
+  display:flex;align-items:center;gap:8px;
+  width:100%;max-width:560px;padding:0 16px 16px;
+  flex-wrap:wrap;justify-content:center;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 18px;border:3px solid var(--ink);border-radius:4px;
+  font-family:'Bangers',cursive;font-size:1rem;letter-spacing:1px;
+  cursor:pointer;transition:all 0.15s;box-shadow:3px 3px 0 var(--ink);
+}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;box-shadow:3px 3px 0 var(--ink);}
+.btn-prev{background:var(--blue);color:#fff;flex:1;min-width:90px;justify-content:center;}
+.btn-next{background:var(--red);color:#fff;flex:1;min-width:90px;justify-content:center;}
+.btn-flip{background:var(--green);color:#fff;flex:1;min-width:90px;justify-content:center;}
+.btn-toc{background:var(--yellow);color:var(--ink);font-size:0.85rem;}
+
+/* TOC MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#1A0A2E;border:4px solid var(--yellow);border-radius:8px;
+  box-shadow:8px 8px 0 rgba(255,215,0,0.3);
+  padding:24px 20px;max-width:420px;width:100%;max-height:82vh;overflow-y:auto;
+}
+.modal h2{font-family:'Bangers',cursive;font-size:1.6rem;color:var(--yellow);text-align:center;letter-spacing:2px;margin-bottom:16px;}
+.toc-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);}
+.toc-item:hover{background:rgba(255,215,0,0.1);}
+.toc-num{width:30px;height:30px;background:var(--red);border:2px solid var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Bangers',cursive;font-size:1rem;color:#fff;flex-shrink:0;}
+.toc-ch{font-size:0.72rem;color:var(--yellow);font-weight:700;letter-spacing:1px;}
+.toc-sub{font-size:0.9rem;color:#E2E8F0;font-weight:700;}
+.modal-close{width:100%;margin-top:14px;background:var(--red);color:#fff;border:3px solid var(--ink);border-radius:4px;padding:10px;cursor:pointer;font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:1px;box-shadow:3px 3px 0 var(--ink);}
+.hint{font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:0 16px 12px;}
+.footer{width:100%;text-align:center;padding:12px;font-size:0.72rem;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.08);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🎣 DON'T GET HOOKED!</h1>
+  <p>A Comic About Phishing — How It Works & How to Stay Safe</p>
+  <div class="level-badge">⭐ BEGINNER LEVEL</div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:10%"></div></div>
+  <div class="prog-txt" id="pTxt">1 / 10</div>
+</div>
+
+<div class="comic-wrap">
+<div class="book" id="book">
+
+<!-- PAGE 1 -->
+<div class="page active" data-page="0">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">📱</span>CHAPTER 1: THE SUSPICIOUS MESSAGE</div>
+  <div class="panel panel-bg-yellow">
+    <div class="char-row"><span class="char">👩🏾</span><div><div class="bubble">I just got a message from my bank saying my account is locked!</div></div></div>
+    <div class="narrator">Amara gets a scary text message on her phone.</div>
+  </div>
+  <div class="panel panel-bg-red">
+    <div class="bubble evil">⚠️ URGENT: Your account has been suspended! Click here NOW to avoid losing your money! → www.b4nk-secure.com</div>
+    <div class="char-row" style="justify-content:flex-end"><span class="char">😰</span></div>
+    <div class="narrator">The message looks real — but something feels off...</div>
+  </div>
+  <div class="panel panel-bg-blue">
+    <div class="char-row"><span class="char">🤔</span><div><div class="bubble">Should I click it? My money could disappear!</div></div></div>
+    <div class="char-row" style="justify-content:flex-end"><span class="char">😈</span><div style="text-align:right"><div class="bubble evil right">Heh heh... she'll never notice the fake website address!</div></div></div>
+  </div>
+  <div class="panel">
+    <div class="narrator">⚠️ STOP! This is PHISHING — a trick to steal your information. Let's learn how to spot it!</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 1</div>
+    <div class="back-title">What Just Happened?</div>
+    <div class="back-points">
+      <div class="back-point">🎣 <strong>Phishing</strong> is when a criminal pretends to be someone you trust — your bank, a company, even a friend — to steal your personal information.</div>
+      <div class="back-point">⚠️ <strong>Urgency</strong> is the #1 trick. "Act NOW or lose your money!" is designed to make you panic and not think clearly.</div>
+      <div class="back-point">🔍 <strong>Look at the URL:</strong> "b4nk-secure.com" uses the number 4 instead of the letter A. Real banks don't do this.</div>
+      <div class="back-point">✅ <strong>Golden rule:</strong> When in doubt, open your browser and type the bank's real website address yourself — never click the link.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" data-page="1">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🎭</span>CHAPTER 2: THE FAKE DISGUISE</div>
+  <div class="panel panel-bg-blue">
+    <div class="char-row"><span class="char">😈</span><div><div class="bubble evil">I'll dress up as the bank and nobody will know it's me!</div></div></div>
+    <div class="narrator">The criminal creates a fake website that looks EXACTLY like the real bank.</div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div style="display:flex;gap:12px;align-items:stretch;">
+      <div style="flex:1;border:2px solid var(--green);border-radius:6px;padding:8px;background:#F0FFF4;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--green);">✅ REAL BANK</div>
+        <div style="font-size:0.8rem;font-weight:700;margin-top:4px;">🔒 www.firstbank.com</div>
+        <div style="font-size:0.72rem;color:#555;margin-top:4px;">Green padlock · Correct spelling · Official address</div>
+      </div>
+      <div style="flex:1;border:2px solid var(--red);border-radius:6px;padding:8px;background:#FFF0F0;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--red);">❌ FAKE SITE</div>
+        <div style="font-size:0.8rem;font-weight:700;margin-top:4px;">🔓 www.firstb4nk-login.com</div>
+        <div style="font-size:0.72rem;color:#555;margin-top:4px;">Strange URL · Different domain · Looks identical inside!</div>
+      </div>
+    </div>
+    <div class="narrator">The fake site copies every colour, logo and word from the real one.</div>
+  </div>
+  <div class="panel panel-bg-red">
+    <div class="char-row"><span class="char">😨</span><div><div class="bubble warn">It looks exactly the same! How can I tell the difference?</div></div></div>
+    <div class="narrator">Amara is confused — the fake site looks perfect. But there IS a way to spot it!</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 2</div>
+    <div class="back-title">The Art of Disguise</div>
+    <div class="back-points">
+      <div class="back-point">🎭 Phishers are like <strong>digital costume artists</strong> — they copy every visual detail of a real website to fool you.</div>
+      <div class="back-point">🔍 <strong>Always check the address bar</strong> at the very top of your browser. The URL is the one thing they cannot perfectly fake.</div>
+      <div class="back-point">🔒 Look for the <strong>padlock icon</strong> — but remember: even fake sites can have padlocks now! The padlock means the connection is encrypted, NOT that the site is safe.</div>
+      <div class="back-point">✏️ <strong>Common tricks:</strong> rn looks like m · 0 instead of o · extra words like "-secure" or "-login" · wrong domain ending (.net instead of .com)</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" data-page="2">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">📧</span>CHAPTER 3: THE BAIT — EMAIL PHISHING</div>
+  <div class="panel panel-bg-yellow">
+    <div class="narrator">Phishing doesn't only happen by SMS. Email is the most common trap!</div>
+    <div style="border:2px solid var(--ink);border-radius:6px;background:#fff;padding:10px;margin-top:8px;">
+      <div style="font-size:0.7rem;color:#888;">From: security@paypa1-alerts.com</div>
+      <div style="font-size:0.7rem;color:#888;">Subject: ⚠️ Unusual Activity Detected!</div>
+      <div style="font-size:0.82rem;font-weight:700;margin-top:6px;color:var(--red);">Dear Valued Customer,</div>
+      <div style="font-size:0.78rem;margin-top:4px;color:#333;">We have detected suspicious login from Nigeria. Your account will be CLOSED in 24 hours unless you verify immediately.</div>
+      <div style="margin-top:8px;background:var(--blue);color:#fff;text-align:center;padding:6px;border-radius:4px;font-size:0.8rem;font-weight:700;">VERIFY MY ACCOUNT NOW →</div>
+    </div>
+  </div>
+  <div class="panel panel-bg-red">
+    <div class="narrator">🚩 RED FLAGS in this email:</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+      <div style="font-size:0.8rem;">❌ Sender: paypa1-alerts.com (uses number 1 not letter l)</div>
+      <div style="font-size:0.8rem;">❌ Creates urgency: "24 hours or CLOSED!"</div>
+      <div style="font-size:0.8rem;">❌ Generic greeting: "Dear Valued Customer"</div>
+      <div style="font-size:0.8rem;">❌ Asks you to click a link to "verify"</div>
+    </div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="char-row"><span class="char">💡</span><div><div class="bubble safe">Real companies NEVER ask for your password by email!</div></div></div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 3</div>
+    <div class="back-title">Email Phishing Red Flags</div>
+    <div class="back-points">
+      <div class="back-point">📧 <strong>Check the sender's email address</strong> carefully — not just the display name. The real address often reveals the trick.</div>
+      <div class="back-point">⏰ <strong>Urgency is manipulation.</strong> "24 hours!" "Act NOW!" "Account will be CLOSED!" — these are pressure tactics to stop you thinking clearly.</div>
+      <div class="back-point">👤 <strong>Generic greetings</strong> like "Dear Customer" or "Dear User" are a warning sign. Your bank knows your name.</div>
+      <div class="back-point">🔑 <strong>No legitimate company</strong> will ever ask for your password, PIN, or one-time code by email, text, or phone call.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" data-page="3">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">📱</span>CHAPTER 4: SMISHING — PHISHING BY TEXT</div>
+  <div class="panel panel-bg-yellow">
+    <div class="bubble evil">📱 MTN Nigeria: Your SIM will be deactivated! Update your details: → mtn-ng-verify.com/urgent</div>
+    <div class="narrator">Smishing = SMS + Phishing. Criminals send fake text messages too!</div>
+  </div>
+  <div class="panel panel-bg-red">
+    <div class="char-row"><span class="char">😱</span><div><div class="bubble warn">My SIM?! I need my phone for everything — mobile money, calls, everything!</div></div></div>
+    <div class="narrator">They target things you REALLY care about losing.</div>
+  </div>
+  <div class="panel panel-bg-blue">
+    <div class="narrator">🛡️ HOW TO CHECK: Open your browser and go directly to mtn.com.ng — don't click the link in the text!</div>
+    <div class="char-row" style="margin-top:8px;"><span class="char">✅</span><div><div class="bubble safe">I went to the real MTN website and logged in. My SIM is fine — it was a scam!</div></div></div>
+  </div>
+  <div class="panel">
+    <div class="narrator">Amara is safe because she didn't click the link. She went directly to the real website herself.</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 4</div>
+    <div class="back-title">Smishing — Text Message Traps</div>
+    <div class="back-points">
+      <div class="back-point">📱 <strong>Smishing</strong> is phishing via SMS. Criminals impersonate telecoms companies, banks, delivery services, and government agencies.</div>
+      <div class="back-point">🎯 <strong>They target your fears:</strong> losing your SIM, missing a package, being arrested, having your account frozen.</div>
+      <div class="back-point">🚫 <strong>Never click links in unexpected text messages.</strong> Go directly to the company's official website by typing the address yourself.</div>
+      <div class="back-point">📞 <strong>Call the company directly</strong> using the number on their official website — not the number in the suspicious text.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page" data-page="4">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">📞</span>CHAPTER 5: VISHING — THE VOICE CALL TRAP</div>
+  <div class="panel panel-bg-red">
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <div class="bubble evil">Hello! This is GTBank fraud department. We have detected a transfer of ₦500,000 from your account. Please confirm your PIN to stop it!</div>
+    </div>
+    <div class="narrator">Vishing = Voice + Phishing. Scammers call you pretending to be your bank.</div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div class="char-row"><span class="char">😰</span><div><div class="bubble warn">₦500,000?! I need to stop this right now! What's my PIN... it's 4-8-2-1...</div></div></div>
+    <div class="narrator">Panic makes people share things they never should.</div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="narrator">✅ WHAT AMARA SHOULD DO:</div>
+    <div class="char-row" style="margin-top:6px;"><span class="char">💪🏾</span><div><div class="bubble safe">I will NOT give my PIN. I'm hanging up and calling the number on the back of my card.</div></div></div>
+  </div>
+  <div class="panel panel-bg-blue">
+    <div class="narrator">🔒 YOUR BANK WILL NEVER ASK FOR YOUR FULL PIN, PASSWORD, OR ONE-TIME CODE ON A CALL.</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 5</div>
+    <div class="back-title">Vishing — Voice Call Scams</div>
+    <div class="back-points">
+      <div class="back-point">📞 <strong>Vishing</strong> uses phone calls to steal information. Criminals sound professional, calm, and authoritative.</div>
+      <div class="back-point">🧠 <strong>They create panic</strong> about your money to bypass your rational thinking. A panicking brain makes bad decisions.</div>
+      <div class="back-point">🚫 <strong>Your bank will NEVER ask</strong> for your full PIN, full card number, or one-time passcode (OTP) during a phone call.</div>
+      <div class="back-point">✅ <strong>Hang up and call back</strong> using the number printed on your bank card or the official bank website. Never use a number the caller gives you.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page" data-page="5">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🤖</span>CHAPTER 6: AI MAKES PHISHING SCARIER</div>
+  <div class="panel panel-bg-red">
+    <div class="char-row"><span class="char">😈</span><div><div class="bubble evil">With AI, I can write perfect phishing messages in any language! No more spelling mistakes to give me away!</div></div></div>
+    <div class="narrator">AI tools help criminals create much more convincing attacks.</div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div class="narrator">Old phishing was easy to spot — bad grammar, weird spelling. NOW:</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">
+      <div style="font-size:0.8rem;">✗ OLD: "Dear sir, you account suspend pleas click link"</div>
+      <div style="font-size:0.8rem;color:var(--red);">✓ AI NOW: "Dear Amara, we noticed unusual activity on your account at 14:32 today from an unfamiliar device in Abuja..."</div>
+    </div>
+  </div>
+  <div class="panel panel-bg-blue">
+    <div class="char-row"><span class="char">😰</span><div><div class="bubble warn">It even used my name and the right time! How do I protect myself now?</div></div></div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="char-row"><span class="char">🛡️</span><div><div class="bubble safe">Even perfect messages can be phishing! Always verify by going directly to the real website yourself.</div></div></div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 6</div>
+    <div class="back-title">AI-Powered Phishing</div>
+    <div class="back-points">
+      <div class="back-point">🤖 <strong>AI generates</strong> grammatically perfect, personalised phishing messages that are much harder to spot than old-style attacks.</div>
+      <div class="back-point">📛 <strong>Your name, location, and recent activities</strong> can be found on social media and used to make messages feel personal and real.</div>
+      <div class="back-point">🔍 <strong>You can no longer rely on spelling mistakes</strong> to identify phishing. Focus on the URL, the sender address, and the request being made.</div>
+      <div class="back-point">✅ <strong>The golden rule never changes:</strong> go directly to the real website yourself. No matter how convincing the message is.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page" data-page="6">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🔐</span>CHAPTER 7: YOUR FIRST LINE OF DEFENCE</div>
+  <div class="panel panel-bg-blue">
+    <div class="narrator">STRONG PASSWORDS — Your first shield!</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF0F0;border:2px solid var(--red);border-radius:6px;padding:6px 10px;">
+        <span style="font-size:0.82rem;">❌ password123</span><span style="font-size:0.72rem;color:var(--red);">TERRIBLE</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF9F0;border:2px solid var(--orange);border-radius:6px;padding:6px 10px;">
+        <span style="font-size:0.82rem;">⚠️ Amara2024</span><span style="font-size:0.72rem;color:var(--orange);">WEAK</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#F0FFF4;border:2px solid var(--green);border-radius:6px;padding:6px 10px;">
+        <span style="font-size:0.82rem;">✅ Jollof!Rice#Lagos99</span><span style="font-size:0.72rem;color:var(--green);">STRONG</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="narrator">TWO-FACTOR AUTHENTICATION (2FA) — Your second shield!</div>
+    <div class="char-row" style="margin-top:8px;"><span class="char">📱</span><div><div class="bubble safe">Even if they steal my password, they still need the code sent to my phone!</div></div></div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div class="narrator">Enable 2FA on your bank, email, and social media accounts RIGHT NOW. It blocks 99% of automated attacks!</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 7</div>
+    <div class="back-title">Passwords & Two-Factor Auth</div>
+    <div class="back-points">
+      <div class="back-point">🔐 <strong>Strong passwords</strong> are long (12+ characters), mix letters, numbers and symbols, and are different for every account.</div>
+      <div class="back-point">🔒 <strong>Two-Factor Authentication (2FA)</strong> means even if a phisher steals your password, they still cannot get into your account without your phone.</div>
+      <div class="back-point">📱 <strong>Enable 2FA everywhere:</strong> your bank, Gmail, WhatsApp, Instagram, and any account that offers it. It is the single most important thing you can do.</div>
+      <div class="back-point">🗝️ <strong>Use a password manager</strong> — apps like Google Password Manager or Bitwarden remember strong unique passwords for every site so you don't have to.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page" data-page="7">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🚨</span>CHAPTER 8: IF YOU GET PHISHED — ACT FAST!</div>
+  <div class="panel panel-bg-red">
+    <div class="char-row"><span class="char">😱</span><div><div class="bubble evil">Oh no... I clicked the link and entered my password. What do I do?!</div></div></div>
+    <div class="narrator">It can happen to anyone. Acting quickly is what matters!</div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div class="narrator">⚡ DO THESE IMMEDIATELY:</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
+      <div style="font-size:0.82rem;font-weight:700;">1️⃣ Change your password on the real website RIGHT NOW</div>
+      <div style="font-size:0.82rem;font-weight:700;">2️⃣ Call your bank to freeze your account if needed</div>
+      <div style="font-size:0.82rem;font-weight:700;">3️⃣ Enable 2FA if you haven't already</div>
+      <div style="font-size:0.82rem;font-weight:700;">4️⃣ Check for any unauthorised transactions</div>
+      <div style="font-size:0.82rem;font-weight:700;">5️⃣ Report the phishing site to the company it impersonated</div>
+    </div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="char-row"><span class="char">💪🏾</span><div><div class="bubble safe">I changed my password immediately. My account is safe and I reported the fake site!</div></div></div>
+    <div class="narrator">Amara acted fast and protected herself!</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 8</div>
+    <div class="back-title">Emergency Response Plan</div>
+    <div class="back-points">
+      <div class="back-point">⚡ <strong>Speed matters.</strong> Every minute you wait gives the attacker more time to use your stolen credentials.</div>
+      <div class="back-point">🔑 <strong>Change your password immediately</strong> on the real website — not through any link in the phishing message.</div>
+      <div class="back-point">🏦 <strong>Call your bank</strong> if you entered financial information. Banks can freeze accounts and reverse fraudulent transactions quickly.</div>
+      <div class="back-point">📣 <strong>Report it.</strong> Report to the company being impersonated, your national cybercrime authority, and warn your contacts in case the attacker targets them next.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 9 -->
+<div class="page" data-page="8">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🛡️</span>CHAPTER 9: AI FIGHTS BACK FOR US!</div>
+  <div class="panel panel-bg-blue">
+    <div class="char-row"><span class="char">🤖</span><div><div class="bubble ai">I'm scanning millions of websites every second. This one looks SUSPICIOUS — blocking it now!</div></div></div>
+    <div class="narrator">AI-powered security tools detect and block phishing sites automatically.</div>
+  </div>
+  <div class="panel panel-bg-green">
+    <div class="narrator">✅ HOW AI PROTECTS YOU:</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
+      <div style="font-size:0.82rem;">🔍 Checks website addresses against billions of known fake sites</div>
+      <div style="font-size:0.82rem;">📧 Scans emails for phishing patterns before they reach your inbox</div>
+      <div style="font-size:0.82rem;">⚡ Blocks dangerous sites in milliseconds — faster than you can blink</div>
+      <div style="font-size:0.82rem;">🧠 Learns new tricks as criminals invent them</div>
+    </div>
+  </div>
+  <div class="panel panel-bg-yellow">
+    <div class="char-row"><span class="char">👩🏾</span><div><div class="bubble">My browser warned me before I even reached the fake site! Technology AND awareness together keep me safe.</div></div></div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">CHAPTER 9</div>
+    <div class="back-title">AI — Your Digital Bodyguard</div>
+    <div class="back-points">
+      <div class="back-point">🤖 <strong>AI security tools</strong> like Google Safe Browsing, Microsoft Defender, and Cloudflare Gateway scan billions of URLs to protect you.</div>
+      <div class="back-point">📧 <strong>Email AI filters</strong> analyse messages for phishing patterns — sender reputation, link destinations, urgency language — before you see them.</div>
+      <div class="back-point">⚡ <strong>Real-time blocking</strong> means AI can identify and block a brand-new phishing site within seconds of it being created.</div>
+      <div class="back-point">🤝 <strong>AI + Human awareness</strong> is the winning combination. Technology helps enormously, but knowing what to look for is your ultimate protection.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 10 -->
+<div class="page" data-page="9">
+<div class="page-inner">
+<div class="page-front">
+<div class="comic-page">
+  <div class="panel-header"><span class="ch-icon">🎓</span>FINAL CHAPTER: YOUR PHISHING SURVIVAL GUIDE</div>
+  <div class="panel panel-bg-green">
+    <div class="narrator">🏆 AMARA'S 5 RULES TO NEVER GET PHISHED:</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+      <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:1.2rem;">1️⃣</span><span style="font-size:0.82rem;font-weight:700;">STOP — Don't panic. Take a breath before you click anything.</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:1.2rem;">2️⃣</span><span style="font-size:0.82rem;font-weight:700;">CHECK — Look at the sender address and the URL carefully.</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:1.2rem;">3️⃣</span><span style="font-size:0.82rem;font-weight:700;">VERIFY — Go directly to the real website. Type it yourself.</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:1.2rem;">4️⃣</span><span style="font-size:0.82rem;font-weight:700;">PROTECT — Use 2FA on every important account.</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:1.2rem;">5️⃣</span><span style="font-size:0.82rem;font-weight:700;">REPORT — Tell the real company and warn your family.</span></div>
+    </div>
+  </div>
+  <div class="panel panel-bg-blue">
+    <div class="char-row"><span class="char">👩🏾</span><div><div class="bubble safe">I taught my mum and my friends too. We protect each other!</div></div></div>
+  </div>
+  <div class="panel" style="background:var(--ink);color:#FFD700;text-align:center;padding:16px;">
+    <div style="font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:2px;">STAY SHARP. STAY SAFE.</div>
+    <div style="font-size:0.8rem;color:#fff;margin-top:6px;">Written by Gbemisola Esho · 2026</div>
+  </div>
+</div>
+</div>
+<div class="page-back">
+  <div class="back-content">
+    <div class="back-ch">FINAL CHAPTER</div>
+    <div class="back-title">You Are Now Phishing-Aware!</div>
+    <div class="back-points">
+      <div class="back-point">🎣 <strong>Phishing</strong> uses fake messages and websites to steal your information by impersonating people you trust.</div>
+      <div class="back-point">📱 It comes via <strong>email, SMS (smishing), phone calls (vishing)</strong>, and social media. AI makes it more convincing than ever.</div>
+      <div class="back-point">🛡️ <strong>Your defences:</strong> strong passwords, 2FA, checking URLs carefully, never clicking links in unexpected messages, and verifying directly.</div>
+      <div class="back-point">📣 <strong>Share this knowledge.</strong> Every person you teach is one fewer victim. Awareness is the most powerful weapon against phishing.</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+</div><!-- /book -->
+</div><!-- /comic-wrap -->
+
+<div class="controls">
+  <button class="btn btn-prev" id="btnPrev" onclick="nav(-1)" disabled>◀ PREV</button>
+  <button class="btn btn-flip" onclick="flip()">🔄 FLIP</button>
+  <button class="btn btn-toc" onclick="openTOC()">📋</button>
+  <button class="btn btn-next" id="btnNext" onclick="nav(1)">NEXT ▶</button>
+</div>
+<p class="hint">Flip to see key lessons · Arrow keys or swipe to turn pages · Space to flip</p>
+
+<!-- TOC -->
+<div class="modal-overlay" id="tocModal" onclick="closeTOC(event)">
+  <div class="modal">
+    <h2>📋 CONTENTS</h2>
+    <div id="tocList"></div>
+    <button class="modal-close" onclick="closeTOC()">CLOSE</button>
+  </div>
+</div>
+
+<div class="footer">Don't Get Hooked! · By Gbemisola Esho · 2026 · Beginner Level</div>
+
+<script>
+const CH=[
+  {n:"Cover",t:"The Suspicious Message"},
+  {n:"Chapter 2",t:"The Fake Disguise"},
+  {n:"Chapter 3",t:"Email Phishing"},
+  {n:"Chapter 4",t:"Smishing — Text Traps"},
+  {n:"Chapter 5",t:"Vishing — Voice Scams"},
+  {n:"Chapter 6",t:"AI Makes Phishing Scarier"},
+  {n:"Chapter 7",t:"Passwords & 2FA"},
+  {n:"Chapter 8",t:"If You Get Phished"},
+  {n:"Chapter 9",t:"AI Fights Back"},
+  {n:"Final",t:"Your Survival Guide"},
+];
+let cur=0;const tot=10;
+const allP=document.querySelectorAll('.page');
+function ui(){
+  allP.forEach((p,i)=>p.classList.toggle('active',i===cur));
+  document.getElementById('btnPrev').disabled=cur===0;
+  document.getElementById('btnNext').disabled=cur===tot-1;
+  document.getElementById('pFill').style.width=((cur+1)/tot*100)+'%';
+  document.getElementById('pTxt').textContent=(cur+1)+' / '+tot;
+  const inn=allP[cur].querySelector('.page-inner');
+  if(inn)inn.classList.remove('flipped');
+}
+function nav(d){const n=cur+d;if(n>=0&&n<tot){cur=n;ui();}}
+function flip(){const inn=allP[cur].querySelector('.page-inner');if(inn)inn.classList.toggle('flipped');}
+function openTOC(){
+  document.getElementById('tocList').innerHTML=CH.map((c,i)=>`
+    <div class="toc-item" onclick="goto(${i})">
+      <div class="toc-num">${i+1}</div>
+      <div><div class="toc-ch">${c.n}</div><div class="toc-sub">${c.t}</div></div>
+    </div>`).join('');
+  document.getElementById('tocModal').classList.add('open');
+}
+function closeTOC(e){if(!e||e.target===document.getElementById('tocModal')||e.currentTarget===document.querySelector('.modal-close'))document.getElementById('tocModal').classList.remove('open');}
+function goto(i){cur=i;ui();document.getElementById('tocModal').classList.remove('open');}
+let sx=0;
+document.getElementById('book').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;});
+document.getElementById('book').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)nav(dx<0?1:-1);});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')nav(1);if(e.key==='ArrowLeft')nav(-1);if(e.key===' '){e.preventDefault();flip();}});
+ui();
+</script>
+</body>
+</html>
