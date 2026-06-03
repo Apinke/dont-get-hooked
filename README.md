@@ -74,8 +74,8 @@ Simply visit: **https://apinke.github.io/dont-get-hooked/**
 | Volume | Level | Topic |
 |---|---|---|
 | **Vol. 1 — Don't Get Hooked!** | ⭐ Beginner | Phishing for every internet user |
-| **Vol. 2 — Phishing Decoded** | ◈ Intermediate | URL forensics, email headers, MFA, IR playbooks |
-| **Vol. 3 — Advanced Threat Analysis** | ◈◈◈ Advanced | AiTM, adversarial ML, Sigma rules, SOAR automation |
+| **Vol. 2 — Phishing Decoded** |  Intermediate | URL forensics, email headers, MFA, IR playbooks |
+| **Vol. 3 — Advanced Threat Analysis** |  Advanced | AiTM, adversarial ML, Sigma rules, SOAR automation |
 
 Also by Gbemisola Esho:
 - 📘 DNS Explained Simply
