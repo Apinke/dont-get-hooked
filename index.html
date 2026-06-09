@@ -679,196 +679,116 @@ document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')nav(1);if(e.key=
 ui();
 </script>
 
-<!-- ── TEXT-TO-SPEECH ENGINE ─────────────────────────────────────────────── -->
+
+
+
+<!-- TTS v4 -->
 <div id="tts-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:300;
-  background:rgba(10,15,40,0.97);border-top:2px solid var(--accent,#00B8D9);
+  background:rgba(10,15,40,0.97);border-top:2px solid #1A73E8;
   padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   box-shadow:0 -4px 20px rgba(0,0,0,0.5);">
   <button id="tts-play" onclick="ttsToggle()" style="background:#1A73E8;color:#fff;border:none;
-    border-radius:6px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
-    ▶ Read Aloud
-  </button>
-  <button id="tts-stop" onclick="ttsStop()" style="background:#F44336;color:#fff;border:none;
-    border-radius:6px;padding:7px 10px;font-size:13px;font-weight:700;cursor:pointer;">
-    ■ Stop
-  </button>
+    border-radius:6px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">▶ Read Aloud</button>
+  <button onclick="ttsStop()" style="background:#F44336;color:#fff;border:none;
+    border-radius:6px;padding:7px 10px;font-size:13px;font-weight:700;cursor:pointer;">■ Stop</button>
   <div style="display:flex;align-items:center;gap:6px;">
     <span style="font-size:11px;color:#94A3B8;">Voice:</span>
-    <button id="btn-female" onclick="setVoiceGender('female')" style="background:#7C4DFF;color:#fff;
-      border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;">👩 Female</button>
-    <button id="btn-male" onclick="setVoiceGender('male')" style="background:#0D6EFD;color:#fff;
-      border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;">👨 Male</button>
+    <button id="btn-f" onclick="setG('female')" style="background:#7C4DFF;color:#fff;border:none;border-radius:4px;padding:4px 9px;font-size:11px;cursor:pointer;">👩 F</button>
+    <button id="btn-m" onclick="setG('male')"   style="background:#0D6EFD;color:#fff;border:none;border-radius:4px;padding:4px 9px;font-size:11px;cursor:pointer;opacity:0.55;">👨 M</button>
   </div>
-  <div style="display:flex;align-items:center;gap:6px;">
+  <div style="display:flex;align-items:center;gap:5px;">
     <span style="font-size:11px;color:#94A3B8;">Speed:</span>
-    <input type="range" id="tts-rate" min="0.5" max="1.8" step="0.1" value="0.95"
-      style="width:70px;accent-color:#1A73E8;" oninput="ttsRateChange(this.value)"/>
-    <span id="tts-rate-lbl" style="font-size:11px;color:#94A3B8;width:28px;">0.95</span>
+    <input type="range" id="tts-spd" min="0.6" max="1.6" step="0.1" value="0.95"
+      style="width:65px;accent-color:#1A73E8;"
+      oninput="tR=parseFloat(this.value);document.getElementById('tts-rl').textContent=this.value"/>
+    <span id="tts-rl" style="font-size:11px;color:#94A3B8;width:30px;">0.95</span>
   </div>
-  <div id="tts-status" style="font-size:11px;color:#64748B;flex:1;text-align:right;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">Ready</div>
+  <div id="tts-lbl" style="font-size:11px;color:#64748B;flex:1;text-align:right;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">Ready</div>
 </div>
-<div style="height:52px;"></div><!-- spacer for fixed bar -->
-
+<div style="height:54px;"></div>
 <script>
-// ── TTS STATE ────────────────────────────────────────────────────────────────
-let ttsVoices = [];
-let ttsVoiceGender = 'female';
-let ttsRate = 0.95;
-let ttsSpeaking = false;
-let ttsQueue = [];
-let ttsQueueIdx = 0;
-
-function loadVoices(){
-  ttsVoices = window.speechSynthesis.getVoices();
+const PS={"0": {"front": ["📱 CHAPTER 1: THE SUSPICIOUS MESSAGE", "I just got a message from my bank saying my account is locked!", "⚠️ URGENT: Your account has been suspended! Click here NOW to avoid losing your money! → www.b4nk-secure.com", "Should I click it? My money could disappear!", "Heh heh... she'll never notice the fake website address!", "Amara gets a scary text message on her phone.", "The message looks real — but something feels off...", "⚠️ STOP! This is PHISHING — a trick to steal your information. Let's learn how to spot it!"], "back": ["CHAPTER 1", "What Just Happened?", "🎣 Phishing is when a criminal pretends to be someone you trust — your bank, a company, even a friend — to steal your personal information.", "⚠️ Urgency is the #1 trick. \"Act NOW or lose your money!\" is designed to make you panic and not think clearly.", "🔍 Look at the URL: \"b4nk-secure.com\" uses the number 4 instead of the letter A. Real banks don't do this.", "✅ Golden rule: When in doubt, open your browser and type the bank's real website address yourself — never click the link."]}, "1": {"front": ["🎭 CHAPTER 2: THE FAKE DISGUISE", "I'll dress up as the bank and nobody will know it's me!", "It looks exactly the same! How can I tell the difference?", "The criminal creates a fake website that looks EXACTLY like the real bank.", "The fake site copies every colour, logo and word from the real one.", "Amara is confused — the fake site looks perfect. But there IS a way to spot it!"], "back": ["CHAPTER 2", "The Art of Disguise", "🎭 Phishers are like digital costume artists — they copy every visual detail of a real website to fool you.", "🔍 Always check the address bar at the very top of your browser. The URL is the one thing they cannot perfectly fake.", "🔒 Look for the padlock icon — but remember: even fake sites can have padlocks now! The padlock means the connection is encrypted, NOT that the site is safe.", "✏️ Common tricks: rn looks like m · 0 instead of o · extra words like \"-secure\" or \"-login\" · wrong domain ending (.net instead of .com)"]}, "2": {"front": ["📧 CHAPTER 3: THE BAIT — EMAIL PHISHING", "Real companies NEVER ask for your password by email!", "Phishing doesn't only happen by SMS. Email is the most common trap!", "🚩 RED FLAGS in this email:"], "back": ["CHAPTER 3", "Email Phishing Red Flags", "📧 Check the sender's email address carefully — not just the display name. The real address often reveals the trick.", "⏰ Urgency is manipulation. \"24 hours!\" \"Act NOW!\" \"Account will be CLOSED!\" — these are pressure tactics to stop you thinking clearly.", "👤 Generic greetings like \"Dear Customer\" or \"Dear User\" are a warning sign. Your bank knows your name.", "🔑 No legitimate company will ever ask for your password, PIN, or one-time code by email, text, or phone call."]}, "3": {"front": ["📱 CHAPTER 4: SMISHING — PHISHING BY TEXT", "📱 MTN Nigeria: Your SIM will be deactivated! Update your details: → mtn-ng-verify.com/urgent", "My SIM?! I need my phone for everything — mobile money, calls, everything!", "I went to the real MTN website and logged in. My SIM is fine — it was a scam!", "Smishing = SMS + Phishing. Criminals send fake text messages too!", "They target things you REALLY care about losing.", "🛡️ HOW TO CHECK: Open your browser and go directly to mtn.com.ng — don't click the link in the text!", "Amara is safe because she didn't click the link. She went directly to the real website herself."], "back": ["CHAPTER 4", "Smishing — Text Message Traps", "📱 Smishing is phishing via SMS. Criminals impersonate telecoms companies, banks, delivery services, and government agencies.", "🎯 They target your fears: losing your SIM, missing a package, being arrested, having your account frozen.", "🚫 Never click links in unexpected text messages. Go directly to the company's official website by typing the address yourself.", "📞 Call the company directly using the number on their official website — not the number in the suspicious text."]}, "4": {"front": ["📞 CHAPTER 5: VISHING — THE VOICE CALL TRAP", "Hello! This is GTBank fraud department. We have detected a transfer of ₦500,000 from your account. Please confirm your PIN to stop it!", "₦500,000?! I need to stop this right now! What's my PIN... it's 4-8-2-1...", "I will NOT give my PIN. I'm hanging up and calling the number on the back of my card.", "Vishing = Voice + Phishing. Scammers call you pretending to be your bank.", "Panic makes people share things they never should.", "✅ WHAT AMARA SHOULD DO:", "🔒 YOUR BANK WILL NEVER ASK FOR YOUR FULL PIN, PASSWORD, OR ONE-TIME CODE ON A CALL."], "back": ["CHAPTER 5", "Vishing — Voice Call Scams", "📞 Vishing uses phone calls to steal information. Criminals sound professional, calm, and authoritative.", "🧠 They create panic about your money to bypass your rational thinking. A panicking brain makes bad decisions.", "🚫 Your bank will NEVER ask for your full PIN, full card number, or one-time passcode (OTP) during a phone call.", "✅ Hang up and call back using the number printed on your bank card or the official bank website. Never use a number the caller gives you."]}, "5": {"front": ["🤖 CHAPTER 6: AI MAKES PHISHING SCARIER", "With AI, I can write perfect phishing messages in any language! No more spelling mistakes to give me away!", "It even used my name and the right time! How do I protect myself now?", "Even perfect messages can be phishing! Always verify by going directly to the real website yourself.", "AI tools help criminals create much more convincing attacks.", "Old phishing was easy to spot — bad grammar, weird spelling. NOW:"], "back": ["CHAPTER 6", "AI-Powered Phishing", "🤖 AI generates grammatically perfect, personalised phishing messages that are much harder to spot than old-style attacks.", "📛 Your name, location, and recent activities can be found on social media and used to make messages feel personal and real.", "🔍 You can no longer rely on spelling mistakes to identify phishing. Focus on the URL, the sender address, and the request being made.", "✅ The golden rule never changes: go directly to the real website yourself. No matter how convincing the message is."]}, "6": {"front": ["🔐 CHAPTER 7: YOUR FIRST LINE OF DEFENCE", "Even if they steal my password, they still need the code sent to my phone!", "STRONG PASSWORDS — Your first shield!", "TWO-FACTOR AUTHENTICATION (2FA) — Your second shield!", "Enable 2FA on your bank, email, and social media accounts RIGHT NOW. It blocks 99% of automated attacks!"], "back": ["CHAPTER 7", "Passwords & Two-Factor Auth", "🔐 Strong passwords are long (12+ characters), mix letters, numbers and symbols, and are different for every account.", "🔒 Two-Factor Authentication (2FA) means even if a phisher steals your password, they still cannot get into your account without your phone.", "📱 Enable 2FA everywhere: your bank, Gmail, WhatsApp, Instagram, and any account that offers it. It is the single most important thing you can do.", "🗝️ Use a password manager — apps like Google Password Manager or Bitwarden remember strong unique passwords for every site so you don't have to."]}, "7": {"front": ["🚨 CHAPTER 8: IF YOU GET PHISHED — ACT FAST!", "Oh no... I clicked the link and entered my password. What do I do?!", "I changed my password immediately. My account is safe and I reported the fake site!", "It can happen to anyone. Acting quickly is what matters!", "⚡ DO THESE IMMEDIATELY:", "Amara acted fast and protected herself!"], "back": ["CHAPTER 8", "Emergency Response Plan", "⚡ Speed matters. Every minute you wait gives the attacker more time to use your stolen credentials.", "🔑 Change your password immediately on the real website — not through any link in the phishing message.", "🏦 Call your bank if you entered financial information. Banks can freeze accounts and reverse fraudulent transactions quickly.", "📣 Report it. Report to the company being impersonated, your national cybercrime authority, and warn your contacts in case the attacker targets them next."]}, "8": {"front": ["🛡️ CHAPTER 9: AI FIGHTS BACK FOR US!", "I'm scanning millions of websites every second. This one looks SUSPICIOUS — blocking it now!", "My browser warned me before I even reached the fake site! Technology AND awareness together keep me safe.", "AI-powered security tools detect and block phishing sites automatically.", "✅ HOW AI PROTECTS YOU:"], "back": ["CHAPTER 9", "AI — Your Digital Bodyguard", "🤖 AI security tools like Google Safe Browsing, Microsoft Defender, and Cloudflare Gateway scan billions of URLs to protect you.", "📧 Email AI filters analyse messages for phishing patterns — sender reputation, link destinations, urgency language — before you see them.", "⚡ Real-time blocking means AI can identify and block a brand-new phishing site within seconds of it being created.", "🤝 AI + Human awareness is the winning combination. Technology helps enormously, but knowing what to look for is your ultimate protection."]}, "9": {"front": ["🎓 FINAL CHAPTER: YOUR PHISHING SURVIVAL GUIDE", "I taught my mum and my friends too. We protect each other!", "🏆 AMARA'S 5 RULES TO NEVER GET PHISHED:"], "back": ["FINAL CHAPTER", "You Are Now Phishing-Aware!", "🎣 Phishing uses fake messages and websites to steal your information by impersonating people you trust.", "📱 It comes via email, SMS (smishing), phone calls (vishing) , and social media. AI makes it more convincing than ever.", "🛡️ Your defences: strong passwords, 2FA, checking URLs carefully, never clicking links in unexpected messages, and verifying directly.", "📣 Share this knowledge. Every person you teach is one fewer victim. Awareness is the most powerful weapon against phishing."]}};
+let tG='female',tR=0.95,tA=false;
+function lV(){window._tv=window.speechSynthesis.getVoices();}
+window.speechSynthesis.onvoiceschanged=lV;lV();
+function pV(g){
+  const vv=window._tv||[];
+  const fp=/female|woman|zira|samantha|victoria|karen|moira|fiona|tessa|google uk english female|google us english/i;
+  const mp=/\bmale\b|daniel|alex|fred|ralph|thomas|google uk english male/i;
+  return vv.find(v=>(g==='female'?fp:mp).test(v.name+v.voiceURI))||vv.find(v=>v.lang&&v.lang.startsWith('en'))||vv[0]||null;
 }
-window.speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices();
-
-function pickVoice(gender){
-  const pref = gender === 'female'
-    ? v => /female|woman|zira|samantha|victoria|karen|moira|fiona|tessa|google uk english female|google us english/i.test(v.name+v.voiceURI)
-    : v => /male|man|daniel|alex|fred|ralph|lee|thomas|google uk english male/i.test(v.name+v.voiceURI);
-  return ttsVoices.find(pref) || ttsVoices.find(v=>v.lang.startsWith('en')) || ttsVoices[0] || null;
+function setG(g){
+  tG=g;
+  document.getElementById('btn-f').style.opacity=g==='female'?'1':'0.55';
+  document.getElementById('btn-m').style.opacity=g==='male'?'1':'0.55';
 }
-
-function setVoiceGender(g){
-  ttsVoiceGender = g;
-  document.getElementById('btn-female').style.opacity = g==='female'?'1':'0.5';
-  document.getElementById('btn-male').style.opacity = g==='male'?'1':'0.5';
-  if(ttsSpeaking){ ttsStop(); ttsPlay(); }
+function spk(arr,i,done){
+  if(!tA||i>=arr.length){if(done)done();return;}
+  const raw=arr[i].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,480);
+  if(!raw){spk(arr,i+1,done);return;}
+  const u=new SpeechSynthesisUtterance(raw);
+  u.rate=tR;u.pitch=1;u.volume=1;
+  const v=pV(tG);if(v)u.voice=v;
+  document.getElementById('tts-lbl').textContent=raw.substring(0,55)+'…';
+  u.onend=()=>spk(arr,i+1,done);
+  u.onerror=()=>spk(arr,i+1,done);
+  window.speechSynthesis.speak(u);
 }
-
-function ttsRateChange(v){
-  ttsRate = parseFloat(v);
-  document.getElementById('tts-rate-lbl').textContent = v;
-}
-
-function getPageText(pageIdx){
-  const pages = document.querySelectorAll('.page');
-  if(pageIdx >= pages.length) return [];
-  const pg = pages[pageIdx];
-  const texts = [];
-
-  // Front side — bubbles, narrators, panel text
-  const front = pg.querySelector('.page-front');
-  if(front){
-    // Chapter header
-    const hdr = front.querySelector('.panel-header, .ch-header');
-    if(hdr) texts.push(hdr.innerText.replace(/[^a-zA-Z0-9 .,!?:()-]/g,'').trim());
-    // All text content
-    front.querySelectorAll('.bubble, .narrator, .sfx, .back-point, p, li, td, .feat-label, .feat-desc, .ri-label, .ri-desc, .item-label, .item-desc, .overlay-line').forEach(el=>{
-      const t = el.innerText.trim();
-      if(t && t.length > 3) texts.push(t);
-    });
-  }
-  return [...new Set(texts)].filter(Boolean);
-}
-
-function getBackText(pageIdx){
-  const pages = document.querySelectorAll('.page');
-  if(pageIdx >= pages.length) return [];
-  const pg = pages[pageIdx];
-  const texts = [];
-  const back = pg.querySelector('.page-back');
-  if(back){
-    back.querySelectorAll('.back-ch,.back-title,.back-point,.bch,.bttl,.bpt,p').forEach(el=>{
-      const t = el.innerText.trim();
-      if(t && t.length > 3) texts.push(t);
-    });
-  }
-  return [...new Set(texts)].filter(Boolean);
-}
-
-function speakText(text, onEnd){
-  if(!text || !window.speechSynthesis) return;
+function ttsReadPage(idx){
+  if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = ttsRate;
-  utt.pitch = 1.0;
-  utt.volume = 1.0;
-  const v = pickVoice(ttsVoiceGender);
-  if(v) utt.voice = v;
-  utt.onend = onEnd || null;
-  utt.onerror = onEnd || null;
-  window.speechSynthesis.speak(utt);
-}
-
-function ttsPlayQueue(queue, idx){
-  if(idx >= queue.length){
-    // After front, read back
-    const cur = typeof window.currentPage !== 'undefined' ? window.currentPage : (typeof cur2 !== 'undefined' ? cur2 : 0);
-    const backTexts = getBackText(cur);
-    if(backTexts.length > 0){
-      const backIntro = new SpeechSynthesisUtterance("Key lessons.");
-      backIntro.rate = ttsRate;
-      const v = pickVoice(ttsVoiceGender);
-      if(v) backIntro.voice = v;
-      backIntro.onend = () => ttsPlayQueue(backTexts, 0);
-      window.speechSynthesis.speak(backIntro);
-    } else {
-      ttsSpeaking = false;
-      document.getElementById('tts-play').textContent = '▶ Read Aloud';
-      document.getElementById('tts-status').textContent = 'Done';
+  tA=true;
+  document.getElementById('tts-play').textContent='⏸ Pause';
+  const d=PS[String(idx)]||PS[idx]||{};
+  const front=d.front||[];
+  const back=d.back||[];
+  if(!front.length&&!back.length){
+    document.getElementById('tts-lbl').textContent='No text';
+    tA=false;return;
+  }
+  spk(front,0,()=>{
+    if(!tA)return;
+    if(back.length){
+      const u=new SpeechSynthesisUtterance('Key lessons.');
+      u.rate=tR;const v=pV(tG);if(v)u.voice=v;
+      u.onend=()=>spk(back,0,()=>{
+        tA=false;
+        document.getElementById('tts-play').textContent='▶ Read Aloud';
+        document.getElementById('tts-lbl').textContent='Done ✓';
+      });
+      window.speechSynthesis.speak(u);
+    }else{
+      tA=false;
+      document.getElementById('tts-play').textContent='▶ Read Aloud';
+      document.getElementById('tts-lbl').textContent='Done ✓';
     }
-    return;
-  }
-  ttsSpeaking = true;
-  document.getElementById('tts-play').textContent = '⏸ Pause';
-  const shortText = queue[idx].substring(0,400);
-  document.getElementById('tts-status').textContent = shortText.substring(0,60)+'…';
-  speakText(shortText, () => ttsPlayQueue(queue, idx+1));
+  });
 }
-
-function ttsPlay(){
-  if(!window.speechSynthesis){ alert('Your browser does not support text-to-speech.'); return; }
-  const cur = typeof window.currentPage !== 'undefined' ? window.currentPage : 0;
-  const texts = getPageText(cur);
-  if(!texts.length){ document.getElementById('tts-status').textContent = 'No text found'; return; }
-  ttsPlayQueue(texts, 0);
-}
-
 function ttsToggle(){
-  if(window.speechSynthesis.speaking && !window.speechSynthesis.paused){
+  if(window.speechSynthesis.speaking&&!window.speechSynthesis.paused){
     window.speechSynthesis.pause();
-    document.getElementById('tts-play').textContent = '▶ Resume';
-    document.getElementById('tts-status').textContent = 'Paused';
-  } else if(window.speechSynthesis.paused){
+    document.getElementById('tts-play').textContent='▶ Resume';
+    document.getElementById('tts-lbl').textContent='Paused';
+  }else if(window.speechSynthesis.paused){
     window.speechSynthesis.resume();
-    document.getElementById('tts-play').textContent = '⏸ Pause';
-  } else {
-    ttsPlay();
+    document.getElementById('tts-play').textContent='⏸ Pause';
+  }else{
+    ttsReadPage(typeof cur!=='undefined'?cur:0);
   }
 }
-
 function ttsStop(){
+  tA=false;
   window.speechSynthesis.cancel();
-  ttsSpeaking = false;
-  document.getElementById('tts-play').textContent = '▶ Read Aloud';
-  document.getElementById('tts-status').textContent = 'Stopped';
+  document.getElementById('tts-play').textContent='▶ Read Aloud';
+  document.getElementById('tts-lbl').textContent='Stopped';
 }
-
-// Auto-play on page change — patch the nav function
-const _origNav = window.nav;
-window.nav = function(d){
-  ttsStop();
-  if(_origNav) _origNav(d);
-  setTimeout(ttsPlay, 600);
-};
-// Also patch goto (TOC nav)
-const _origGoto = window.goto;
-window.goto = function(i){
-  ttsStop();
-  if(_origGoto) _origGoto(i);
-  setTimeout(ttsPlay, 600);
-};
-
-// Auto-play on load
-window.addEventListener('load', () => {
-  loadVoices();
-  setTimeout(ttsPlay, 1200);
-});
+(function(){
+  const _n=window.nav,_g=window.goto;
+  window.nav=function(d){ttsStop();if(_n)_n(d);setTimeout(()=>ttsReadPage(typeof cur!=='undefined'?cur:0),500);};
+  window.goto=function(i){ttsStop();if(_g)_g(i);setTimeout(()=>ttsReadPage(i),500);};
+})();
+window.addEventListener('load',()=>{lV();setTimeout(()=>ttsReadPage(0),1200);});
 </script>
-
 </body>
 </html>
